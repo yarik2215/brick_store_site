@@ -144,3 +144,6 @@ cython_debug/
 
 #Django secret key
 secret-key.txt
+
+# ignore site mediafiles
+media/*

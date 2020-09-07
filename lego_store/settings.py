@@ -21,10 +21,11 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = os.environ.get('BRICK_STORE_SECRET_KEY', '')
-SECRET_KEY = None
-with open('secret-key.txt', 'r') as f:
-    SECRET_KEY = f.read().strip()
+# SECRET_KEY = os.environ.get('BRICK_STORE_SECRET_KEY', None)
+SECRET_KEY = os.environ.get('SECRET_KEY', None)
+# SECRET_KEY = None
+# with open('secret-key.txt', 'r') as f:
+#     SECRET_KEY = f.read().strip()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -129,3 +130,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
