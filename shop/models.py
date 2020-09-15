@@ -57,15 +57,19 @@ class Order(models.Model):
         WAITING = 0, _("waiting")
         PROCESSING = 1, _("processing")
         DONE = 2, _("done")
+        CANCELED = 3, _("canceled")
 
     customer = models.ForeignKey('Customer', on_delete=models.CASCADE)  # add validation that user is in customer group
     items = models.ManyToManyField('Item',through='OrderItems')
     order_date = models.DateField(_("order date"))
     delivery_address = models.CharField(max_length=255)
     status = models.IntegerField(_("status"), choices=Status.choices, default=Status.WAITING)
+    # price = models.DecimalField(_("price"),max_digits=10,decimal_places=2)
 
+    #FIXME: думаю лучше хранить цену заказа отдельно, если поменяется цена продукта это не должно влиять на цену заказа
+    @property
     def price(self):
-        return sum( (i.price for i in self.items.all()) ) #TODO: add calculation of all price of order
+        return sum( (i.price * i.orderitems_set.get(item=i,order=self).item_count for i in self.items.all()) ) #TODO: add calculation of all price of order
 
 
 

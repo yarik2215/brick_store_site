@@ -20,9 +20,18 @@ class OrderItemsInline(admin.StackedInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'get_user_name', 'order_date')
+    list_display = ('pk', 'get_user_name', 'order_date', 'price', 'status')
+    list_filter = ('status',)
     inlines = (OrderItemsInline,)
     date_hierarchy = 'order_date'
+    actions = ('close_order','process_order')
+
+    def close_order(self, request, queryset):
+        queryset.update(status=Order.Status.DONE)
+
+    def process_order(self, request, queryset):
+        queryset.update(status=Order.Status.PROCESSING)
+
 
     def get_user_name(self, obj):
         return obj.customer.username
