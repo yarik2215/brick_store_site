@@ -1,0 +1,8 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<div class="item">
+    <p>Item {{object.name}} | {{object.color_name}}</p>
+    <img src="{{object.image.url}}" alt="item.slug" height="100px" width="100px">
+</div>
+{% endblock content %}
