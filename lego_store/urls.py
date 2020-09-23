@@ -18,9 +18,11 @@ from django.urls import include, path
 
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import RedirectView
 
 urlpatterns = [
-    path('shop/', include('shop.urls')),
+    path('',RedirectView.as_view(url='/shop/',permanent=True)),
+    path('shop/', include('shop.urls'),),
     path('admin/', admin.site.urls),
 ]
 if settings.DEBUG:

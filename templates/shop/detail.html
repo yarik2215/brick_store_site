@@ -1,8 +1,11 @@
 {% extends 'shop/base.html' %}
 
 {% block content %}
-<div class="item">
-    <p>Item {{object.name}} | {{object.color_name}}</p>
+<div class="card">
+    <h2>{{object.name | capfirst}}</h2>
     <img src="{{object.image.url}}" alt="item.slug" height="100px" width="100px">
+    <p>ID : {{object.id}}</p>
+    <p>Color : {{object.color_name}}</p>
+    <strong><a href="#">Buy</a></strong>
 </div>
 {% endblock content %}
