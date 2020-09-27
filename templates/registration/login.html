@@ -1,0 +1,33 @@
+{% extends "shop/base.html" %}
+
+{% block content %}
+
+  <h2>Please log in</h2>
+
+  <div class="text-center">
+      {% if form.errors %}
+        <p class="text-danger">Your username and password didn't match. Please try again.</p>
+      {% endif %}
+
+      {% if user.is_authenticated %}
+        <p>User already logged in.</p>
+        <a href=" {% url 'logout' %} ">Logout.</a>
+      {% else %}
+
+      <form method="post" action="{% url 'login' %}" class="form-group" style="max-width:400px; display: inline-block;">
+      {% csrf_token %}
+      
+      <input type="text" name="{{form.username.name}}" required="" autofocuse="" placeholder="Username" class="form-control">
+      <input type="password" name="{{form.password.name}}" required="" placeholder="Password" class="form-control">
+      <p style="height: 20px;"></p>
+      <button class="btn btn-lg btn-dark btn-block" type="submit" value="login">Log in</button>
+      <input type="hidden" name="next" value="{{ next }}" />
+      </form>
+
+      {# Assumes you setup the password_reset view in your URLconf #}
+      <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+      <p><a href="{% url 'register' %}">Reigister</a></p>
+  </div>
+{% endif %}
+
+{% endblock %}

@@ -1,7 +1,9 @@
-<!--Sidebar-->
 {% extends 'shop/base.html' %} 
+{% load static %}
+
+<!--Sidebar-->
 {% block sidebar %}
-<div class="container col-sm bg-light">
+<div class="container col-sm bg-light" style="max-width:200px; margin:10px;">
 <h4>Filter</h4>
 <form action="container">
   {% for f_item in item_types %}
@@ -25,22 +27,24 @@
 
 <!--Content-->
 {% block content %} 
-{% load static %}
 
-<link rel="stylesheet" href="{% static 'mystyle.css' %}" />
+{% comment %} <link rel="stylesheet" href="{% static 'mystyle.css' %}" /> {% endcomment %}
 
 <!-- Page Content -->
-<div class="container">
+<div style="margin:20px">
   <div class="container">
     <div class="row">
       <!-- Item -->
       {% for item in item_list %}
       <div class="card" style="width: 18rem;">
-        <img class="card-img-top item_img" src="{{item.image.url}}" alt="item.slug">
+        <div class="center">
+          <!--class card-img-top-->
+          <img class="item-img" src="{{item.image.url}}" alt="item.slug">
+        </div>
         <div class="card-body">
           <p class="card-text">ID: {{item.id}}</p>
           <p class="card-text">Color: {{item.color_name}}</p>
-          <b><a href="{% url 'shop:detail' item.pk%}">{{item.name | capfirst}}</a></b>
+          <b><a href="{% url 'shop:detail' item.pk%}?next={{request.path}}">{{item.name | capfirst}}</a></b>
         </div>
       </div>
       {% endfor %}

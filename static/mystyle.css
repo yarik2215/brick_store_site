@@ -6,12 +6,31 @@
     width: 200px;
 }
 
-.item_img{
+.item-img{
     height: 120px;
     width: 120px;
 }
 
-.nav_logo{
-    height: 40px;
-    width: 50px;
+.nav-logo{
+    height: 30px;
+    width: 40px;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.shop-container{
+    margin: 10px;
+}
+
+.shop-navbar{
+    background-color: rgb(108, 173, 208);
+    color: #161616;
+}
+
+.shop-navlink{
+    color: #161616;
+}
+
+.shop-navlink:hover{
+    color: #853434;
 }

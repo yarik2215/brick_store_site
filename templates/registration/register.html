@@ -1,0 +1,21 @@
+{% extends "shop/base.html" %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+    <p>You are already logged in. Please <a href=" {% url 'logout' %}">log out</a> first.</p>
+{% else %}
+  <h2>Registration</h2>
+
+  <div class="text-center">
+    <form method="POST" class="form-group">
+        {% csrf_token %}
+        <table>
+        {{ form.as_table }}
+        </table>
+        <button type="submit" class="btn btn-success">Register</button>
+    </form>
+  </div>
+{% endif %}
+
+{% endblock %}

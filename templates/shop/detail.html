@@ -1,6 +1,9 @@
 {% extends 'shop/base.html' %}
 
 {% block content %}
+<div class="text-left">
+<a href="{{next}}">Back</a>
+</div>
 <div class="card">
     <h2>{{object.name | capfirst}}</h2>
     <img src="{{object.image.url}}" alt="item.slug" height="100px" width="100px">

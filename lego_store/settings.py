@@ -136,3 +136,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 # AUTH_USER_MODEL = 'shop.ShopUser'
+
+
+LOGIN_REDIRECT_URL = '/'
+
+
+# Email backend 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
