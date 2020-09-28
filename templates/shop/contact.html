@@ -3,7 +3,13 @@
 
 {% block content %}
 <div>
-    <h3>Contacts</h3>
-    <p>Some contact info.</p>
+    <h3>Contact Us</h3>
+    <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="form-actions">
+      <button type="submit">Send</button>
+    </div>
+  </form>
 </div>
 {% endblock content %}

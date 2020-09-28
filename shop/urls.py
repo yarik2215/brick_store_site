@@ -12,7 +12,7 @@ urlpatterns = [
     path('', views.ItemList.as_view(), name='index'),
     path('about/', views.about_view, name='about'),
     path('<int:pk>/detail/',views.ItemDetail.as_view(), name='detail'),    
-    path('contact/',TemplateView.as_view(template_name='shop/contact.html'),name='contact'), #FIXME: add view for Contact US with contact form
+    path('contact/',views.contact_view, name='contact'), #FIXME: add view for Contact US with contact form
     path('cart/', views.cart_view, name='cart'),
     path('account/', views.account_view, name='account'),
 ] 
