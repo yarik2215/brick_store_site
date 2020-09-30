@@ -16,11 +16,11 @@
           <b>{{item.name | capfirst}}</b>
           <p class="card-text">ID: {{item.id}}</p>
           <p class="card-text">Color: {{item.color_name}}</p>
-          <p class="card-text">Quantity: {{item.qnty}} </p>
+          <p class="card-text">Quantity: {{item.item_count}} </p>
         </div>
         <p>
           <a href=" {% url 'shop:delete_from_cart' item.id %}">Delete</a> | 
-          <a href=" {% url 'shop:detail' item.id %}?back={{request.path}},item_quantity={{item.qnty}}">Update</a> |
+          <a href=" {% url 'shop:detail' item.id %}?back={{request.path}}&item_quantity={{item.item_count}}">Update</a> |
         </p>
       </div>
       {% endfor %}

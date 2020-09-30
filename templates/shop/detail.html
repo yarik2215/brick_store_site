@@ -12,7 +12,8 @@
     <form action="" method="post">
         {% csrf_token %}
         <table>
-        {{form}}
+        {{form.item_id}}
+        <input type="number" name="form.item_quantity.name" min="1" max="999" value="{{form.item_quantity.value}}" >
         </table>
         <button type="submit" class="btn btn-success">Add to cart</button>
     </form>

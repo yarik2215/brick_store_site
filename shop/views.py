@@ -1,3 +1,5 @@
+import django
+from django.core.exceptions import FieldDoesNotExist
 from django.core.mail import message
 from django.http import request
 from django.shortcuts import render, reverse, get_object_or_404, redirect
@@ -11,6 +13,9 @@ from .forms import RegisterForm, ContactFrom, PurchaseItemForm
 from django.core.mail import send_mail, BadHeaderError
 from django.contrib import messages
 
+# For logging into request console
+# import logging
+# logger = logging.getLogger('django.request')
 
 # class ItemDetail(generic.DetailView):
 #     model = Item
@@ -20,24 +25,41 @@ from django.contrib import messages
 #         context = super().get_context_data(**kwargs)
 #         context["back"] = self.request.GET['back']
 #         return context
+
+# TODO: implement migrate cart view for migrating cart from session to db when user lodding in
+def migrate_card(request):
+    pass
+
     
 def add_to_cart(request, item_pk, n_items):
-        if request.user.is_authenticated:
-            request.user.customer
-        else:
-            #TODO: add sessions cart
-            try:
-                cart = request.session['cart']
-            except KeyError:
-                request.session['cart'] = dict()
-                cart = request.session['cart']
+    '''
+    Add current item to cart. If user is logged cart stores in database model Cart
+    else cart stores in session
+    '''
+    if request.user.is_authenticated:
+        obj,created = request.user.customer.cart_set.get_or_create(item_id=item_pk, defaults={'item_count':n_items})
+        if obj:
+            obj.item_count = n_items
+            obj.save()
+    else:
+        try:
+            cart = request.session['cart']
+        except KeyError:
+            request.session['cart'] = dict()
+            cart = request.session['cart']
 
-            cart[item_pk] = n_items
-            request.session.modified = True
+        cart[item_pk] = n_items
+        request.session.modified = True
+
 
 def delete_from_cart(request, item_pk):
+    '''
+    Delete current item from cart.
+    '''
     if request.user.is_authenticated:
-            request.user.customer
+        obj = request.user.customer.cart_set.get(item_id=item_pk)
+        obj.delete()
+        messages.add_message(request, messages.SUCCESS, 'Item was deleted.')
     else:
         try:
             cart = request.session['cart']
@@ -47,7 +69,11 @@ def delete_from_cart(request, item_pk):
             messages.add_message(request, messages.WARNING, 'Something go wrong.')
         request.session.modified = True
 
+
 def delete_item_view(request, pk):
+    '''
+    View to confirm that you want to delet current item.
+    '''
     object = None
     if request.method == 'POST':
         delete_from_cart(request, pk)
@@ -58,13 +84,18 @@ def delete_item_view(request, pk):
     context = {'item':object}
     return render(request, 'shop/delete_item.html', context)
 
-def detail_view(request, pk, **kwargs):
 
+def detail_view(request, pk, **kwargs):
+    '''
+    Detail view for Item.
+    '''
     form = None
     back = request.GET.get('back',reverse('shop:index'))
     object = Item.objects.get(pk=pk)
     if request.method == 'GET':
-        form = PurchaseItemForm(initial={'item_id':pk,'item_quantity':request.GET.get('item_quantity', 1)})
+        default_qnty = request.GET.get('item_quantity', 1)
+        # logger.info(f'Default quantity = {request.GET}')
+        form = PurchaseItemForm(initial={'item_id':pk,'item_quantity':default_qnty})
     elif request.method == 'POST':
         form = PurchaseItemForm(request.POST)
         if form.is_valid():
@@ -77,6 +108,10 @@ def detail_view(request, pk, **kwargs):
 
 
 class ItemList(generic.ListView):
+    '''
+    List view of Items.
+    '''
+
     queryset = Item.objects.all()
     paginate_by = 6
     template_name = 'shop/index.html'
@@ -92,18 +127,22 @@ def about_view(request, pk=1):
     context = None
     return render(request, 'shop/about.html', context)
 
+from django.db.models import F
 
 def cart_view(request):
-    context = {}
+    '''
+    View for rendering cart.
+    '''
+    items = None
     if request.user.is_authenticated:
-        pass
+        items = request.user.customer.cart_items.all().annotate(item_count=F('cart__item_count'))
     else:
         cart = request.session.get('cart',[])
         items = Item.objects.filter(pk__in=cart)
         for i in items:
-            i.qnty = cart[str(i.id)]
-        context['objects_list'] = items
-
+            i.item_count = cart[str(i.id)]
+    
+    context = {'objects_list':items}
     return render(request, 'shop/cart.html', context)
 
 
