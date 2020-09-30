@@ -4,5 +4,29 @@
 {% block content %}
 <div>
     <h3>Cart</h3>
+
+    {% if objects_list %}
+        {% for item in objects_list %}
+      <div class="card" style="width: 18rem;">
+        <div class="center">
+          <!--class card-img-top-->
+          <img class="item-img" src="{{item.image.url}}" alt="item.slug">
+        </div>
+        <div class="card-body">
+          <b>{{item.name | capfirst}}</b>
+          <p class="card-text">ID: {{item.id}}</p>
+          <p class="card-text">Color: {{item.color_name}}</p>
+          <p class="card-text">Quantity: {{item.qnty}} </p>
+        </div>
+        <p>
+          <a href=" {% url 'shop:delete_from_cart' item.id %}">Delete</a> | 
+          <a href=" {% url 'shop:detail' item.id %}?back={{request.path}},item_quantity={{item.qnty}}">Update</a> |
+        </p>
+      </div>
+      {% endfor %}
+    {% else %}
+        <p>Cart is empty.</p>
+    {% endif %}
+
 </div>
 {% endblock content %}

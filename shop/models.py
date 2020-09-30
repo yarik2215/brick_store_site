@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.deletion import CASCADE
+from django.db.models.fields.related import ForeignKey
 from django.utils.translation import gettext_lazy as _
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 
@@ -118,9 +121,10 @@ class Customer(User):
     '''
     User information model
     '''
-    phone = models.CharField(_("phone number"), max_length=20, null=True) #TODO: add phone validator validators=[]
-    addres = models.CharField(_("addres"), max_length=255, null=True,
+    phone = models.CharField(_("phone number"), max_length=20, null=True, blank=True) #TODO: add phone validator validators=[]
+    addres = models.CharField(_("addres"), max_length=255, null=True,blank=True,
                             help_text='Use as default delivery addres.') #TODO: add adress validation
+    cart_items = models.ManyToManyField('Item', through='Cart')
 
     class Meta:
         verbose_name = 'customer'
@@ -128,3 +132,14 @@ class Customer(User):
 
     def __str__(self):
         return self.username
+    
+
+
+
+class Cart(models.Model):
+    '''
+    Cart for logged in users.
+    '''
+    user = ForeignKey('Customer',on_delete=CASCADE)
+    item = ForeignKey('Item',on_delete=CASCADE)
+    item_count = models.IntegerField()
