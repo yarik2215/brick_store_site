@@ -12,6 +12,7 @@ from .models import Item, ItemType, Order
 from .forms import RegisterForm, ContactFrom, PurchaseItemForm, OrderForm
 from django.core.mail import send_mail, BadHeaderError
 from django.contrib import messages
+from .filters import ItemFilter
 
 # For logging into request console
 import logging
@@ -107,22 +108,27 @@ def detail_view(request, pk, **kwargs):
     context = {'back':back, 'form':form, 'object':object}
     return render(request, 'shop/detail_item.html', context)
 
+from django_filters.views import FilterView
 
-
-class ItemList(generic.ListView):
+class ItemList(FilterView):
     '''
     List view of Items.
     '''
 
-    queryset = Item.objects.all()
+    # queryset = Item.objects.all()
+    model = Item
+    filterset_fields = ['item_type']
     paginate_by = 6
     template_name = 'shop/index.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["item_types"] = ItemType.objects.all()
-        return context
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context["item_types"] = ItemType.objects.all()
+    #     return context
     
+# def item_list_view(request):
+
+
 
 from django.db.models import F
 

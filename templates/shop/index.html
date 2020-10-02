@@ -4,23 +4,11 @@
 <!--Sidebar-->
 {% block sidebar %}
 <div class="container col-sm bg-light" style="max-width:200px; margin:10px;">
-<h4>Filter</h4>
-<form action="container">
-  {% for f_item in item_types %}
-  <div class="form-check">
-    <label class="form-check-label">
-      <input
-        type="checkbox"
-        class="form-check-input"
-        name="{{f_item.name}}"
-        value="checkedValue"
-      />
-      {{f_item.name}}
-    </label>
-  </div>
-  {% endfor %}
-  <button type="submit" class="btn btn-primary">Apply</button>
-</form>
+  <h4>Filter</h4>
+  <form method="get">
+      {{ filter.form.as_p }}
+      <input type="submit" />
+  </form>
 </div>
 {% endblock sidebar %} 
 <!--/Sidebar-->
