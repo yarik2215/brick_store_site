@@ -8,14 +8,14 @@ from django.http import HttpResponseRedirect
 from django.views import generic
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth.decorators import login_required
-from .models import Item, ItemType
-from .forms import RegisterForm, ContactFrom, PurchaseItemForm
+from .models import Item, ItemType, Order
+from .forms import RegisterForm, ContactFrom, PurchaseItemForm, OrderForm
 from django.core.mail import send_mail, BadHeaderError
 from django.contrib import messages
 
 # For logging into request console
-# import logging
-# logger = logging.getLogger('django.request')
+import logging
+logger = logging.getLogger('django.request')
 
 # class ItemDetail(generic.DetailView):
 #     model = Item
@@ -36,8 +36,9 @@ def add_to_cart(request, item_pk, n_items):
     Add current item to cart. If user is logged cart stores in database model Cart
     else cart stores in session
     '''
+    item_pk = int(item_pk)
     if request.user.is_authenticated:
-        obj,created = request.user.customer.cart_set.get_or_create(item_id=item_pk, defaults={'item_count':n_items})
+        obj,created = request.user.cart_set.get_or_create(item_id=item_pk, defaults={'item_count':n_items})
         if obj:
             obj.item_count = n_items
             obj.save()
@@ -94,17 +95,18 @@ def detail_view(request, pk, **kwargs):
     object = Item.objects.get(pk=pk)
     if request.method == 'GET':
         default_qnty = request.GET.get('item_quantity', 1)
-        # logger.info(f'Default quantity = {request.GET}')
+        logger.info(f'Default quantity = {request.GET}')
         form = PurchaseItemForm(initial={'item_id':pk,'item_quantity':default_qnty})
     elif request.method == 'POST':
         form = PurchaseItemForm(request.POST)
         if form.is_valid():
             messages.add_message(request, messages.SUCCESS, 'Added to cart.')
             add_to_cart(request, form.cleaned_data['item_id'], form.cleaned_data['item_quantity']) #TODO: передавать в посте сколько предметов нужно добавить
-            return HttpResponseRedirect(reverse('shop:detail', args=[pk]) + f'?back={back}')
+            return HttpResponseRedirect(reverse('shop:detail_item', args=[pk]) + f'?back={back}')
     
     context = {'back':back, 'form':form, 'object':object}
-    return render(request, 'shop/detail.html', context)
+    return render(request, 'shop/detail_item.html', context)
+
 
 
 class ItemList(generic.ListView):
@@ -122,12 +124,63 @@ class ItemList(generic.ListView):
         return context
     
 
+from django.db.models import F
 
-def about_view(request, pk=1):
+
+def order_detail_view(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    items = order.items.annotate(item_count=F('orderitems__item_count')) #Add annotate to add item quantity
+    context = {'order':order, 'items':items}
+    return render(request, 'shop/detail_order.html', context)
+
+
+def about_view(request):
     context = None
     return render(request, 'shop/about.html', context)
 
-from django.db.models import F
+
+
+
+def create_order_view(request):
+
+    customer = request.user if request.user.is_authenticated else None
+    form = None
+    if request.method == 'GET':
+        if customer:
+            form = OrderForm(initial={'first_name':customer.first_name, 'last_name':customer.last_name,
+                            'phone':customer.phone, 'delivery_address':customer.address})
+        else:
+            form = OrderForm()
+    else:
+        form = OrderForm(request.POST)
+
+        if form.is_valid():
+            order = Order(customer=customer, delivery_address=form.cleaned_data['delivery_address'],
+                        status=Order.Status.WAITING, price='0.0')
+            order.save()
+
+            if customer:
+                items = customer.cart_items.all().annotate(item_count=F('cart__item_count'))
+                for i in items:
+                    order.items.add(i, through_defaults={'item_count':i.item_count})
+                customer.cart_items.clear()
+                order.price = order.order_price()
+                order.save()
+            else:
+                cart = request.session['cart']
+                items = Item.objects.filter(pk__in=cart)
+                for i in items:
+                    order.items.add(i, through_defaults={'item_count':cart[str(i.id)]})
+                del request.session['cart']
+                order.price = order.order_price()
+                order.save()
+            return redirect(reverse('shop:index'))
+
+    context = {'form':form}
+    return render(request, 'shop/order_form.html', context)
+
+
+
 
 def cart_view(request):
     '''
@@ -135,13 +188,14 @@ def cart_view(request):
     '''
     items = None
     if request.user.is_authenticated:
-        items = request.user.customer.cart_items.all().annotate(item_count=F('cart__item_count'))
+        items = request.user.cart_items.all().annotate(item_count=F('cart__item_count'))
     else:
         cart = request.session.get('cart',[])
         items = Item.objects.filter(pk__in=cart)
         for i in items:
             i.item_count = cart[str(i.id)]
     
+
     context = {'objects_list':items}
     return render(request, 'shop/cart.html', context)
 
@@ -172,7 +226,8 @@ def contact_view(request):
 
 @login_required(login_url='login')
 def account_view(request):
-    context = {}
+    orders = request.user.order_set.all()
+    context = {'orders':orders}
     return render(request, 'shop/account.html', context)
 
 

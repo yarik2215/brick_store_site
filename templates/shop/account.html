@@ -4,5 +4,12 @@
 {% block content %}
 <div>
     <h3>Account</h3>
+    <ol>
+        {% for order in orders %}
+        <li>
+            <a href="{% url 'shop:detail_order' order.id %}">Order_{{order.id}}</a>
+        </li>
+        {% endfor %}
+    </ol>
 </div>
 {% endblock content %}

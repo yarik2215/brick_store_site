@@ -1,0 +1,18 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<h1>Order #{{order.id}}</h1>
+<p>Order date: {{order.order_date}}</p>
+
+<ul>
+{% for item in items %}
+    <li>
+        <p>
+            <img src="{{item.image.url}}" height="100px" width="100px">
+            <a href=" {% url 'shop:detail_item' item.id %}">{{item.name}}</a> 
+            ({{item.item_count}})
+        </p>
+    </li>
+{% endfor %}
+</ul>
+{% endblock content %}

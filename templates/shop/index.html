@@ -44,7 +44,7 @@
         <div class="card-body">
           <p class="card-text">ID: {{item.id}}</p>
           <p class="card-text">Color: {{item.color_name}}</p>
-          <b><a href="{% url 'shop:detail' item.pk%}?back={{request.path}}">{{item.name | capfirst}}</a></b>
+          <b><a href="{% url 'shop:detail_item' item.pk%}?back={{request.path}}">{{item.name | capfirst}}</a></b>
         </div>
       </div>
       {% endfor %}

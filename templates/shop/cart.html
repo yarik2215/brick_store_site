@@ -20,10 +20,11 @@
         </div>
         <p>
           <a href=" {% url 'shop:delete_from_cart' item.id %}">Delete</a> | 
-          <a href=" {% url 'shop:detail' item.id %}?back={{request.path}}&item_quantity={{item.item_count}}">Update</a> |
+          <a href=" {% url 'shop:detail_item' item.id %}?back={{request.path}}&item_quantity={{item.item_count}}">Update</a> |
         </p>
       </div>
       {% endfor %}
+      <a href="{% url 'shop:create_order' %}">Order</a>
     {% else %}
         <p>Cart is empty.</p>
     {% endif %}

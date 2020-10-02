@@ -8,12 +8,13 @@
     <h2>{{object.name | capfirst}}</h2>
     <img src="{{object.image.url}}" alt="item.slug" height="100px" width="100px">
     <p>ID : {{object.id}}</p>
-    <p>Color : {{object.color_name}}</p>
+    <p>Color : {{object.color.name}}</p>
     <form action="" method="post">
         {% csrf_token %}
         <table>
+        {{form.errors}}
         {{form.item_id}}
-        <input type="number" name="form.item_quantity.name" min="1" max="999" value="{{form.item_quantity.value}}" >
+        <input type="number" name="{{form.item_quantity.name}}" min="1" max="{{object.quantity}}" value="{{form.item_quantity.value}}" >
         </table>
         <button type="submit" class="btn btn-success">Add to cart</button>
     </form>
